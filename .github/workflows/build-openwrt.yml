@@ -5,41 +5,42 @@
 # See /LICENSE for more information.
 #
 name: build-openWrt
-run-name: 我的OpenWrt云编译：${{ inputs.TITLE_SHOW }}
+run-name: My OpenWrt cloud compilation：${{ inputs.TITLE_SHOW }}
 env:
   REPO_URL: https://github.com/cnbbx/Openwrt-src.git
   REPO_BRANCH: openwrt-22.03
   FEEDS_CONF: feeds.conf.default
   BUILD_USER: ${{ github.actor }}
-  TZ: Asia/Shanghai
+  # TZ: Asia/Shanghai
+  TZ: Asia/Ho_Chi_Minh
 
 on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
       UPLOAD_BIN_DIR:
-        description: " 保存编译后的全部文件"
+        description: "Save all compiled files"
         type: boolean
         default: true
       UPLOAD_RELEASE:
-        description: "发布固件到Releases"
+        description: "Release firmware to Releases"
         type: boolean
         default: true
-      YOUKU_BUILD:
-        description: "开启youku_yk-l2编译"
-        type: boolean
-        default: true
+      # YOUKU_BUILD:
+      #   description: "开启youku_yk-l2编译"
+      #   type: boolean
+      #   default: true
       NEWIFI_BUILD:
-        description: "开启d-team_newifi-d2编译"
+        description: "Enable d-team_newifi-d2 compilation"
         type: boolean
         default: true
-      X86_BUILD:
-        description: "开启x86_64编译"
-        type: boolean
-        default: true
+      # X86_BUILD:
+      #   description: "开启x86_64编译"
+      #   type: boolean
+      #   default: true
       TITLE_SHOW:
         type: string
-        description: 任务流程标题
+        description: "Task process title"
 
   #schedule:
   #  - cron: '5 22 * * 0'
@@ -50,29 +51,29 @@ jobs:
     strategy:
       matrix:
         include:
-          - FIRMWARE_NAME: youku_yk-l2
-            FIRMWARE_BUILD: ${{ inputs.YOUKU_BUILD }}
+          # - FIRMWARE_NAME: youku_yk-l2
+          #   FIRMWARE_BUILD: ${{ inputs.YOUKU_BUILD }}
           - FIRMWARE_NAME: d-team_newifi-d2
             FIRMWARE_BUILD: ${{ inputs.NEWIFI_BUILD }}
-          - FIRMWARE_NAME: x86_64
-            FIRMWARE_BUILD: ${{ inputs.X86_BUILD }}
+          # - FIRMWARE_NAME: x86_64
+          #   FIRMWARE_BUILD: ${{ inputs.X86_BUILD }}
     steps:
       - name: checkout
         uses: actions/checkout@main
 
-      - name: 检查空间使用情况
+      - name: Check space usage
         run: |
-          echo "警告⚠"
-          echo -e "-------------- ------------CPU信息------------------------------------------\n"
-          echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
-          echo -e "CPU核心及版本信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-          echo "-------------------------------内存信息-------------------------------------------"
-          echo "已安装内存详细信息："
+          echo "Warning⚠"
+          echo -e "-------------- ------------CPU Information------------------------------------------\n"
+          echo "CPU physical quantity: $(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
+          echo -e "CPU Core and version information: $(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+          echo "-------------------------------Memory Information-------------------------------------------"
+          echo "Installed memory details:"
           sudo lshw -short -C memory | grep GiB
           echo -e "\n"
-          echo "-----------------------------硬盘信息---------------------------------------------"
-          echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
-          echo "硬盘详情："
+          echo "-----------------------------Hard disk information---------------------------------------------"
+          echo -e  "Number of hard drives:$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
+          echo "Hard drive details:"
           df -Th
 
       - name: 初始化系统环境
